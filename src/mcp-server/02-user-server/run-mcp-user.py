@@ -11,7 +11,7 @@ class SSEServer(Server):
         return await self.serve(sockets=sockets)
 
 configList = [
-    {"port": 8000, "script": "server-mcp-sse-user:sse_app"}
+    {"port": 8002, "script": "server-mcp-sse-user:sse_app"}
 ]
 
 async def run():

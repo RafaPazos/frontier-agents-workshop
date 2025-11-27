@@ -1,3 +1,8 @@
 https://github.com/warnov/ms-agent-framework-step-by-step-workshop/blob/main/09-agents-middleware/app.py
 
 https://github.com/microsoft/agentic-ai-lab/blob/main/chat-rag/3-basic-rag.ipynb
+
+declaratibe agents
+https://github.com/microsoft/agent-framework/blob/main/python/samples/getting_started/declarative/openai_responses_agent.py
+
+https://github.com/microsoft/agent-framework/blob/main/agent-samples/openai/OpenAIAssistants.yaml

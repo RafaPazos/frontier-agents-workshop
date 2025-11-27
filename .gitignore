@@ -5,7 +5,10 @@ __pycache__/
 
 # C extensions
 *.so
+scratch.txt
+story.md
 
+src/scenarios/**
 # Distribution / packaging
 .Python
 build/
