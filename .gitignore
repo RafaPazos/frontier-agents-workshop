@@ -8,7 +8,6 @@ __pycache__/
 scratch.txt
 story.md
 
-src/scenarios/**
 # Distribution / packaging
 .Python
 build/

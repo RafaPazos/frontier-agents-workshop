@@ -7,10 +7,9 @@ Join us for an immersive hands-on lab focused on Microsoft Agent Framework, wher
 1. [Overview](#overview)
 2. [Prerequisites](#prerequisites)
 3. [Environment Setup](#environment-setup)
-4. [Repository Guide](#repository-guide)
-5. [Learning Path](#learning-path)
-6. [Troubleshooting](#troubleshooting)
-7. [Additional Resources](#additional-resources)
+4. [Workshop Scenarios](#workshop-scenarios)
+5. [Troubleshooting](#troubleshooting)
+6. [Additional Resources](#additional-resources)
 
 ## What is an Agent?
 
@@ -52,69 +51,38 @@ A simple LLM-based chatbot primarily focuses on generating responses based on pr
     ```
 
     or rename the file `.env.template` to `.env` and put the value inside the `.env` file. Each python script will load the value from that value automatically.
+ 
+## Workshop Scenarios
 
-## Repository Guide
-This repository contains sample agents, workflows, and MCP servers you can run locally.
+This workshop is organized into seven independent, progressively more advanced scenarios. Each scenario has its own `README.md` in `src/scenarios` describing goals, tasks, references, and example prompts.
 
-### Samples
+1. **Scenario 1 – learning how to build your first agent**  
+   Learn how to define a basic agent, connect tools, and use the Agent Framework Dev UI to inspect activities, metrics, and traces while the agent answers time and weather questions and maintains conversational memory.  
+   See `src/scenarios/01-hello-world-agent/README.md`.
 
-- `samples/simple-agents/basic-agent.py` – minimal single agent using GitHub models.
-- `samples/simple-agents/agents-using-mcp.py` – agent calling tools exposed via MCP.
-- `samples/simple-agents/human-in-the-loop.py` – demonstrates human approval / intervention patterns.
-- `samples/workflows/generation-workflow.py` – simple generation-first workflow orchestration sample.
-- `samples/workflows/parallel-agents.py` – runs multiple agents in parallel and aggregates results.
- - `samples/a2a_communication/server/__main__.py` – A2A weather Q&A agent server sample.
- - `samples/a2a_communication/agent-client.py` – client sample calling an external A2A-compliant agent.
+2. **Scenario 2 – building a user interface for your agent**  
+   Build a console-based client that talks to your agent over the AG-UI protocol, so you can send user input and receive agent responses without building a full web UI.  
+   See `src/scenarios/02-building-agent-ui/README.md`.
 
+3. **Scenario 3 – exposing your agents to other agents**  
+   Expose a weather agent over the A2A protocol and connect it to a separate travel-planning agent that calls it remotely to plan 5-day trips only to locations with good weather.  
+   See `src/scenarios/03-connecting-two-agents/README.md`.
 
-### MCP servers
-This repo includes several example MCP-compatible servers you can run locally:
+4. **Scenario 4 – orchestrating a workflow across multiple agents**  
+   Use deterministic workflows to control the order in which several agents (preference collection, location suggestion, weather checking, summarization) collaborate to create a travel plan.  
+   See `src/scenarios/04-orchestrating-agents/README.md`.
 
-- **Customer MCP server** (`src/mcp-server/01-customer-server/`)
-    - Run SSE server:
-        ```bash
-        cd src/mcp-server/01-customer-server
-        python server-mcp-sse-customers.py
-        ```
-    - Run sample client/runner:
-        ```bash
-        cd src/mcp-server/01-customer-server
-        python run-mcp-customers.py
-        ```
+5. **Scenario 5 – declarative agents and workflows**  
+   Recreate the travel planning and weather validation flow using declarative agent and workflow definitions instead of imperative code, to understand low-code orchestration patterns.  
+   See `src/scenarios/05-declarative-agents/README.md`.
 
-- **User MCP server** (`src/mcp-server/02-user-server/`)
-    - Run SSE server:
-        ```bash
-        cd src/mcp-server/02-user-server
-        python server-mcp-sse-user.py
-        ```
-    - Run sample client/runner:
-        ```bash
-        cd src/mcp-server/02-user-server
-        python run-mcp-user.py
-        ```
+6. **Scenario 6 – moderating a discussion between agents**  
+   Design a multi-agent travel system (places, weather, activities, flights, hotels) coordinated by a moderator/orchestrator such as Magentic One, enforcing global rules like budget, preferred locations, and activity diversity.  
+   See `src/scenarios/06-moderating-agents/README.md`.
 
-- **Banking MCP server** (`src/mcp-server/03-banking-server/`)
-    - Run SSE server:
-        ```bash
-        cd src/mcp-server/03-banking-server
-        python server-mcp-sse-banking.py
-        ```
-    - Run sample client/runner:
-        ```bash
-        cd src/mcp-server/03-banking-server
-        python run-mcp-banking.py
-        ```
-
-### Scenarios
-
-In this workshop we want to learn about the following enterprise multi agent scenarios:
-- Building multi-agent scenarios with graph based workflows or concurrent orchestration patterns
-- Implementing human in the loop pattern with human approval
-- Integrating MCP servers for different tooling scenarios
-- Moderating a conversation between different agents to distribute problem solving using agents
-- Connecting agents from different platforms using MCP (agents as tool) or A2A (distributed agent communication)
-- Implementing elf-learning agent patterns using memory
+7. **Scenario 7 – agent observability and evaluation**  
+   Enable OpenTelemetry-based tracing and metrics for one of your agents, wire it to an observability backend if available, and use evaluation loops and custom metrics to analyze and improve behavior.  
+   See `src/scenarios/07-observability/README.md`.
 
 ## Troubleshooting
 
