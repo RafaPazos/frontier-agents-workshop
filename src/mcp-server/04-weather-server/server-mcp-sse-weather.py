@@ -1,4 +1,5 @@
 import asyncio
+import logging
 from datetime import datetime
 
 import pytz
@@ -9,9 +10,17 @@ from mcp.server.fastmcp.prompts import base
 
 load_dotenv()
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("WeatherTimeSpace")
+
 mcp = FastMCP("WeatherTimeSpace")
 
-sse_app = mcp.http_app(path="/sse", transport="sse")
+# Use Streamable HTTP transport (recommended for web deployments)
+streamable_http_app = mcp.http_app(path="/mcp", transport="streamable-http")
 
 
 # Six popular locations mapped to IANA time zones
@@ -66,8 +75,10 @@ def get_version() -> dict:
 @mcp.tool()
 def list_supported_locations() -> list[str]:
     """List the six popular locations that this server supports."""
-
-    return list(LOCATIONS.keys())
+    logger.info("Tool called: list_supported_locations")
+    result = list(LOCATIONS.keys())
+    logger.info(f"Returning {len(result)} supported locations")
+    return result
 
 
 @mcp.tool()
@@ -77,7 +88,7 @@ def get_weather_at_location(location: str) -> str:
     The response depends on the time of day at the location (morning, afternoon, evening, night)
     but is otherwise deterministic and not based on live data.
     """
-
+    logger.info(f"Tool called: get_weather_at_location(location='{location}')")
     norm = _normalize_location(location)
     if norm not in LOCATIONS:
         return "Unsupported location. Use `list_supported_locations` to see valid options."
@@ -94,19 +105,22 @@ def get_weather_at_location(location: str) -> str:
 
     local_time_str = now_local.strftime("%Y-%m-%d %H:%M")
 
-    return (
+    result = (
         f"Weather for {norm} at {local_time_str} ({bucket}): "
         f"{description}"
     )
+    logger.info(f"Returning weather for {norm}: {bucket}")
+    return result
 
 
 @mcp.tool()
 def get_weather_for_multiple_locations(locations: list[str]) -> list[str]:
     """Get static weather for multiple supported locations at their current local times."""
-
+    logger.info(f"Tool called: get_weather_for_multiple_locations(locations={locations})")
     results: list[str] = []
     for loc in locations:
         results.append(get_weather_at_location(loc))
+    logger.info(f"Returning weather for {len(results)} locations")
     return results
 
 
@@ -151,7 +165,7 @@ async def check_mcp(mcp: FastMCP):
 if __name__ == "__main__":
     try:
         asyncio.run(check_mcp(mcp))
-        uvicorn.run(sse_app, host="0.0.0.0", port=8002)
+        uvicorn.run(streamable_http_app, host="0.0.0.0", port=8003)
     except KeyboardInterrupt:
         print("\nProgram interrupted by user. Cleaning up...")
     except Exception as e:

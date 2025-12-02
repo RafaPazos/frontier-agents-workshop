@@ -1,3 +1,4 @@
+import logging
 import uvicorn
 import os
 from dotenv import load_dotenv
@@ -18,9 +19,18 @@ data_layer.load_customer_from_json(os.path.join(data_path, "customers.json"))
 data_layer.load_inventory_from_json(os.path.join(data_path, "inventory.json"))
 load_dotenv()
 
-mcp = FastMCP("EcommerceAPIs", "1.0.0")
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("EcommerceAPIs")
 
-sse_app = mcp.http_app(path="/sse", transport="sse")
+mcp = FastMCP("EcommerceAPIs")
+
+# Use Streamable HTTP transport (recommended for web deployments)
+streamable_http_app = mcp.http_app(path="/mcp", transport="streamable-http")
+
 
 @mcp.resource("config://version")
 def get_version() -> dict: 
@@ -57,8 +67,14 @@ async def get_order_by_id(order_id: str) -> Order:
 @mcp.tool()
 async def update_order(order_id: str, order: Order) -> bool:
     """Updates an existing order by referencing the order ID"""
-    print("received order update")
-    return data_layer.update_order(order_id, order)
+    logger.info(f"Tool called: update_order | order_id={order_id}, order={order}")
+    try:
+        result = data_layer.update_order(order_id, order)
+        logger.info(f"Tool completed: update_order | order_id={order_id}, success={result}")
+        return result
+    except Exception as e:
+        logger.error(f"Tool error: update_order | order_id={order_id}, error={str(e)}")
+        raise
 
 @mcp.resource("resource://inventory/{product_id}/productinventory")
 async def get_inventory_by_product_id(product_id: str) -> list[ProductInventory]:
@@ -100,7 +116,7 @@ async def check_mcp(mcp: FastMCP):
 if __name__ == "__main__":
     try:
         asyncio.run(check_mcp(mcp))
-        uvicorn.run(sse_app, host="0.0.0.0", port=8000)
+        uvicorn.run(streamable_http_app, host="0.0.0.0", port=8001)
     except KeyboardInterrupt:
         print("\nProgram interrupted by user. Cleaning up...")
     except Exception as e:

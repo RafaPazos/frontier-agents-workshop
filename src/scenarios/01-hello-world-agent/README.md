@@ -16,8 +16,8 @@ Relevant samples:
 - [`samples/simple-agents/basic-agent.py`](../../../samples/simple-agents/basic-agent.py) – basic agent that calls a tool.
 - [`samples/simple-agents/agent-thread.py`](../../../samples/simple-agents/agent-thread.py) – simple agent that can manage a conversation.
 - [`samples/simple-agents/agents-using-mcp.py`](../../../samples/simple-agents/agents-using-mcp.py) – simple agent that can use an MCP server.
-- [`src/mcp-server/02-user-server/run-mcp-user.py`](../../mcp-server/02-user-server/run-mcp-user.py) – simple MCP server that knows about users and their locations.
-- [`src/mcp-server/04-weather-server/run-mcp-weather.py`](../../mcp-server/04-weather-server/run-mcp-weather.py) – simple MCP server that provides time-of-day–aware weather per location.
+- [`src/mcp-server/02-user-server/server-mcp-sse-user.py`](../../mcp-server/02-user-server/run-mcp-user.py) – simple MCP server that knows about users and their locations.
+- [`src/mcp-server/04-weather-server/server-mcp-sse-weather.py`](../../mcp-server/04-weather-server/run-mcp-weather.py) – simple MCP server that provides time-of-day–aware weather per location.
 
 Input queries:
 - "I am currently in London"

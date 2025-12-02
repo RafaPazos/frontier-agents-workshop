@@ -1,32 +1,13 @@
-import logging
-import sys
-import os
-import asyncio
 import uvicorn
-from uvicorn import Server, Config
+import asyncio
 
-class SSEServer(Server):
-    async def run(self, sockets=None):
-        self.config.get_loop_factory()
-        return await self.serve(sockets=sockets)
-
-configList = [
-    {"port": 8001, "script": "server-mcp-sse-customers:sse_app"}
-]
-
-async def run():
-    apps = []
-    for cfg in configList:
-        config = Config(cfg["script"], host="0.0.0.0",
-                        port=cfg["port"])
-        server = SSEServer(config=config)
-        apps.append(server.run())
-    return await asyncio.gather(*apps)
+from server_mcp_sse_customers import mcp, check_mcp, sse_app
 
 if __name__ == "__main__":
     try:
-        loop = asyncio.new_event_loop()
-        loop.run_until_complete(run())
+        asyncio.run(check_mcp(mcp))
+        uvicorn.run(sse_app, host="0.0.0.0", port=8001)
+    except KeyboardInterrupt:
+        print("\nProgram interrupted by user. Cleaning up...")
     except Exception as e:
-        print(e)
-        sys.exit(0)
+        print(f"An error occurred: {e}")

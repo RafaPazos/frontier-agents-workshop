@@ -1,3 +1,4 @@
+import logging
 import uvicorn
 import os
 import asyncio
@@ -12,9 +13,16 @@ from mcp.server.fastmcp.prompts import base
 
 load_dotenv()
 
-mcp = FastMCP("DateTimeSpace")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
+logger = logging.getLogger("UserTimeLocation")
 
-sse_app = mcp.http_app(path="/sse", transport="sse")
+mcp = FastMCP("UserTimeLocation")
+
+# Use Streamable HTTP transport (recommended for web deployments)
+streamable_http_app = mcp.http_app(path="/mcp", transport="streamable-http")
 
 users = {
     "Dennis": {
@@ -37,22 +45,27 @@ def get_version() -> dict:
 @mcp.tool()
 async def get_current_user() -> str:
     """Get the username of the current user."""
-    return "Dennis"
+    logger.info("Tool called: get_current_user")
+    result = "Dennis"
+    logger.info(f"Tool completed: get_current_user | result={result}")
+    return result
 
 @mcp.tool()
 def get_current_location(username: str) -> str:
     """Get the current timezone location of the user for a given username."""
-    print(username)
+    logger.info(f"Tool called: get_current_location | username={username}")
     if username in users:
-        return users[username]["location"]
+        result = users[username]["location"]
     else:
-        return "Europe/London"
+        result = "Europe/London"
+    logger.info(f"Tool completed: get_current_location | username={username}, result={result}")
+    return result
 
 @mcp.tool()
 def get_current_time(location: str) -> str:
     """Get the current time in the given location. The pytz is used to get the timezone for that location. Location names should be in a format like America/Seattle, Asia/Bangkok, Europe/London. Anything in Germany should be Europe/Berlin"""
+    logger.info(f"Tool called: get_current_time | location={location}")
     try:
-        print("get current time for location: ", location)
         location = str.replace(location, " ", "")
         location = str.replace(location, "\"", "")
         location = str.replace(location, "\n", "")
@@ -63,20 +76,24 @@ def get_current_time(location: str) -> str:
         now = datetime.now(timezone)
         current_time = now.strftime("%I:%M:%S %p")
 
+        logger.info(f"Tool completed: get_current_time | location={location}, result={current_time}")
         return current_time
     except Exception as e:
-        print("Error: ", e)
+        logger.error(f"Tool error: get_current_time | location={location}, error={str(e)}")
         return "Sorry, I couldn't find the timezone for that location."
     
 
 @mcp.tool()
 async def move(username: str, newlocation: str) -> bool:
     """Move the user to a new location. Returns true if the user was moved successfully, false otherwise."""
+    logger.info(f"Tool called: move | username={username}, newlocation={newlocation}")
     if username in users:
         users[username]["location"] = newlocation
-        return True
+        result = True
     else:
-        return False
+        result = False
+    logger.info(f"Tool completed: move | username={username}, newlocation={newlocation}, success={result}")
+    return result
 
 @mcp.prompt()
 def get_user_time(username: str) -> list[base.Message]:
@@ -115,10 +132,11 @@ async def check_mcp(mcp: FastMCP):
     
     return mcp
 
+
 if __name__ == "__main__":
     try:
         asyncio.run(check_mcp(mcp))
-        uvicorn.run(sse_app, host="0.0.0.0", port=8000)
+        uvicorn.run(streamable_http_app, host="0.0.0.0", port=8002)
     except KeyboardInterrupt:
         print("\nProgram interrupted by user. Cleaning up...")
     except Exception as e:
